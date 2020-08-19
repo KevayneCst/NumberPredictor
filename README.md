@@ -1,6 +1,6 @@
-* NumberPredictor
+# NumberPredictor
 
-** Présentation du projet
+## Présentation du projet
 
 Le projet a pour finalité la déduction d'une logique lorsque l'on fournit au programme une suite de nombre.
 Le but du jeu donc, serait que, si je donne la suite suivante : 0,1,2,3,4 ; le programme devra me donner la logique de la suite 
