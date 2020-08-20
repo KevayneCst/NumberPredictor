@@ -67,6 +67,7 @@ public class Expression {
 				continue;
 			}
 		}
+		System.out.println(openParentheses == closeParentheses);
 		return openParentheses == closeParentheses;
 	}
 
