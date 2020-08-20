@@ -38,6 +38,24 @@ public class Expression {
 		int lengthInputExpression = inputExpression.length();
 		for (int i=0; i<lengthInputExpression; i++) {
 			
+	private double genericSimpleComputation(String target, char operator) {
+		String[] expressions = target.split("\\" + operator);
+		if (expressions.length != 2) {
+			throw new IllegalArgumentException("Trop de signes " + operator);
+		}
+		double operator1 = Double.parseDouble(expressions[0]);
+		double operator2 = Double.parseDouble(expressions[1]);
+		switch (operator) {
+		case MULTIPLY:
+			return operator1 * operator2;
+		case DIVIDE:
+			return operator1 / operator2;
+		case PLUS:
+			return operator1 + operator2;
+		case MINUS:
+			return operator1 - operator2;
+		default:
+			throw new UnknownError("Operateur inconnu : " + operator);
 		}
 	}
 
@@ -130,5 +148,7 @@ public class Expression {
 		System.out.println(e.assertParenthesesFormed("(bonjour (yolo)))"));
 		System.out.println(e.assertParenthesesFormed("o)(bonjour (y(olo))"));
 		System.out.println("\n"+e.assertNoMathematicalUnknow("sqrt x e pi"));
+		System.out.println(e.genericSimpleComputation("9 - 3", '-'));
+		System.out.println(e.genericSimpleComputation("4+3", '+'));
 	}
 }
