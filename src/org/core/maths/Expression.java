@@ -29,8 +29,9 @@ public class Expression {
 	public Expression(String expression) {
 		if (assertParenthesesFormed(expression)) {
 			this.inputExpression = expression;
+		} else { 
+			throw new UnsupportedOperationException("Les parenthèses ne sont pas fermés ou commencent par une fermée");
 		}
-		throw new UnsupportedOperationException("Les parenthèses ne sont pas fermés ou comment par une fermée");
 	}
 
 	public double computeExpression(double d) {
@@ -67,7 +68,6 @@ public class Expression {
 				continue;
 			}
 		}
-		System.out.println(openParentheses == closeParentheses);
 		return openParentheses == closeParentheses;
 	}
 
