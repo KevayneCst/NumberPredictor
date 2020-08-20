@@ -1,7 +1,8 @@
 package org.core.maths;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -29,15 +30,66 @@ public class Expression {
 	public Expression(String expression) {
 		if (assertParenthesesFormed(expression)) {
 			this.inputExpression = expression;
-		} else { 
+		} else {
 			throw new UnsupportedOperationException("Les parenthèses ne sont pas fermés ou commencent par une fermée");
 		}
 	}
 
-	public double computeExpression(double d) {
-		int lengthInputExpression = inputExpression.length();
-		for (int i=0; i<lengthInputExpression; i++) {
-			
+	/**
+	 * Découpe la chaîne de caractère passée en paramètre et va renvoyer le contenu
+	 * de celle-ci. Dans le cas où il n'y aurait pas de parenthèses, on renvoie la
+	 * chaîne en paramètre initial
+	 * 
+	 * @param target
+	 * @return
+	 */
+	private String cutFirstParenthesis(String target) {
+		int indexStartParenthesis = target.indexOf("(");
+		if (indexStartParenthesis != -1) {
+			int indexEndParenthesis = findIndexClosingParenthesisOfFirstParentheses(target);
+			String parenthesesContent = target.substring(indexStartParenthesis + 1, indexEndParenthesis);
+			if (parenthesesContent.isBlank()) {
+				return "";
+			} else {
+				return parenthesesContent;
+			}
+		}
+		return target;
+	}
+
+	/**
+	 * Renvoie l'indice de la parenthèse fermante qui ferme les parenthèses de la
+	 * première parenthèse ouverte.
+	 * 
+	 * Exemples :
+	 * <ul>
+	 * <li>(hello(no)) => 10</li>
+	 * <li>(good(morning?)night) => 20</li>
+	 * <li>(hi how are you)(not fine) => 15</li>
+	 * </ul>
+	 * 
+	 * Si la parenthèse fermante n'est pas trouvé, renvoie -1, mais ce cas ne
+	 * devrait jamais se présenter (on s'en est assuré à l'initialisation)
+	 * 
+	 * @param target
+	 * @return
+	 */
+	private int findIndexClosingParenthesisOfFirstParentheses(String target) {
+		Deque<Boolean> stack = new ArrayDeque<>();
+		int lengthTarget = target.length();
+		for (int i = 0; i < lengthTarget; i++) {
+			if (target.charAt(i) == '(') {
+				stack.push(true);
+			} else if (target.charAt(i) == ')') {
+				stack.pop();
+				if (stack.isEmpty()) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
 	private double genericSimpleComputation(String target, char operator) {
 		String[] expressions = target.split("\\" + operator);
 		if (expressions.length != 2) {
@@ -63,7 +115,8 @@ public class Expression {
 		if (assertNoMathematicalUnknow(replacement)) {
 			return target.replace("x", replacement);
 		}
-		throw new UnsupportedOperationException("La chaîne de remplacement contient des inconnus, veuillez les supprimer");
+		throw new UnsupportedOperationException(
+				"La chaîne de remplacement contient des inconnus, veuillez les supprimer");
 	}
 
 	private boolean assertParenthesesFormed(String target) {
@@ -93,13 +146,13 @@ public class Expression {
 		List<Integer> ignoredIndexs = listOfMathemicalExpressionIndexs(target);
 		int lengthString = target.length();
 		for (int i = 0; i < lengthString; i++) {
-			if (!ignoredIndexs.contains(i) && (target.charAt(i)+"").matches("[a-zA-Z]+")) {
+			if (!ignoredIndexs.contains(i) && (target.charAt(i) + "").matches("[a-zA-Z]+")) {
 				return false;
 			}
 		}
 		return true;
 	}
-	
+
 	private List<Integer> listOfMathemicalExpressionIndexs(String target) {
 		List<Integer> allIndexs = new ArrayList<>();
 		allIndexs.addAll(findIndexsOfE(target));
@@ -147,8 +200,15 @@ public class Expression {
 		System.out.println(e.assertParenthesesFormed(")(bonjour (yolo))"));
 		System.out.println(e.assertParenthesesFormed("(bonjour (yolo)))"));
 		System.out.println(e.assertParenthesesFormed("o)(bonjour (y(olo))"));
-		System.out.println("\n"+e.assertNoMathematicalUnknow("sqrt x e pi"));
+		System.out.println("\n" + e.assertNoMathematicalUnknow("sqrt x e pi"));
 		System.out.println(e.genericSimpleComputation("9 - 3", '-'));
 		System.out.println(e.genericSimpleComputation("4+3", '+'));
+		System.out.println(e.cutFirstParenthesis("(4+2)(2+9)"));
+		System.out.println(e.cutFirstParenthesis("()(2+9)"));
+		System.out.println(e.cutFirstParenthesis("(       )(2+9)"));
+		System.out.println(e.cutFirstParenthesis("(4+2(2+9))"));
+		System.out.println(e.findIndexClosingParenthesisOfFirstParentheses("(hello(no))") + " => 10");
+		System.out.println(e.findIndexClosingParenthesisOfFirstParentheses("(good(morning?)night)") + " => 20");
+		System.out.println(e.findIndexClosingParenthesisOfFirstParentheses("(hi how are you)(not fine)") + " => 15");
 	}
 }
