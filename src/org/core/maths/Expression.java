@@ -1,15 +1,27 @@
 package org.core.maths;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
-
 /**
- * Classe représentant une expression mathématique (par exemple <i>3x + 2</i>)
- * et apportant différentes fonctionnalitées et opérations possibles sur cette
- * expression (comme par exemple calculer l'expression en remplaçant les
- * inconnus par un nombre donné en entré).
+ * Classe représentant une expression mathématique. Voici la liste des fonctions
+ * mathématiques actuellements prisent en compte :<br>
+ * <i>Pour ce qui va suivre, X est a remplacer par votre valeur (ça peut être un
+ * chiffre ou un autre calcul)<br>
+ * Et pour les fonctions mathématiques et constantes, veillez à avoir un espace
+ * avant et après (sauf si ce ne sont pas des lettres)</i>
+ * <ul>
+ * <li>Exponentiel => écrire <b>e</b></li>
+ * <li>Pi => écrire <b>pi</b></li>
+ * <li>Racine carré => écrire <b>sqrt(X)</b></li>
+ * <li>Log => écrire <b>log(X)</b></li>
+ * <li>Logarithme népérien => écrire <b>ln(X)</b></li>
+ * <li>Sinus => écrire <b>sin(X)</b></li>
+ * <li>Cosinus => écrire <b>cos(X)</b></li>
+ * <li>Tangente => écrire <b>tan(X)</b></li>
+ * <li><b></b></li>
+ * <li><b></b></li>
+ * <li><b></b></li>
+ * <li><b></b></li>
+ * <li><b></b></li>
+ * </ul>
  * 
  * @author Kévin Constantin
  *
@@ -17,173 +29,150 @@ import java.util.List;
 public class Expression {
 
 	private static final String SQUARE_ROOT = "sqrt";
+	private static final String EXPONENTIAL = "e";
+	private static final String LOG = "log";
+	private static final String LN = "ln";
+	private static final String SIN = "sin";
+	private static final String COS = "cos";
+	private static final String TAN = "tan";
 	private static final String PI = "pi";
-	private static final char EXPONENTIAL = 'e';
-	private static final char SQUARE = '²';
+	private static final char POWER = '^';
 	private static final char PLUS = '+';
 	private static final char MINUS = '-';
 	private static final char MULTIPLY = '*';
 	private static final char DIVIDE = '/';
+	private static final char SPACE = ' ';
 
 	private String inputExpression;
 
 	public Expression(String expression) {
-		if (assertParenthesesFormed(expression)) {
-			this.inputExpression = expression;
-		} else {
-			throw new UnsupportedOperationException("Les parenthèses ne sont pas fermés ou commencent par une fermée");
-		}
+		this.inputExpression = expression;
 	}
 
 	/**
-	 * Découpe la chaîne de caractère passée en paramètre et va renvoyer le contenu
-	 * de celle-ci. Dans le cas où il n'y aurait pas de parenthèses, on renvoie la
-	 * chaîne en paramètre initial
+	 * Effectue l'évaluation de l'expression. Ce code comprend une grande partie du
+	 * code trouvable ici (domaine libre)
+	 * <a><u>https://stackoverflow.com/a/26227947</u></a>. J'ai modifié quelques
+	 * parties du code et je vais rajouter progressivement (comme c'est déjà le cas)
+	 * de nouvelles fonctionnalitées (exemple; log, ln, pi, et exponential n'étaient
+	 * pas pris en compte avant)...
 	 * 
-	 * @param target
 	 * @return
 	 */
-	private String cutFirstParenthesis(String target) {
-		int indexStartParenthesis = target.indexOf("(");
-		if (indexStartParenthesis != -1) {
-			int indexEndParenthesis = findIndexClosingParenthesisOfFirstParentheses(target);
-			String parenthesesContent = target.substring(indexStartParenthesis + 1, indexEndParenthesis);
-			if (parenthesesContent.isBlank()) {
-				return "";
-			} else {
-				return parenthesesContent;
-			}
-		}
-		return target;
-	}
+	public double eval() {
+		return new Object() {
+			String str = inputExpression;
+			int pos = -1, ch;
 
-	/**
-	 * Renvoie l'indice de la parenthèse fermante qui ferme les parenthèses de la
-	 * première parenthèse ouverte.
-	 * 
-	 * Exemples :
-	 * <ul>
-	 * <li>(hello(no)) => 10</li>
-	 * <li>(good(morning?)night) => 20</li>
-	 * <li>(hi how are you)(not fine) => 15</li>
-	 * </ul>
-	 * 
-	 * Si la parenthèse fermante n'est pas trouvé, renvoie -1, mais ce cas ne
-	 * devrait jamais se présenter (on s'en est assuré à l'initialisation)
-	 * 
-	 * @param target
-	 * @return
-	 */
-	private int findIndexClosingParenthesisOfFirstParentheses(String target) {
-		Deque<Boolean> stack = new ArrayDeque<>();
-		int lengthTarget = target.length();
-		for (int i = 0; i < lengthTarget; i++) {
-			if (target.charAt(i) == '(') {
-				stack.push(true);
-			} else if (target.charAt(i) == ')') {
-				stack.pop();
-				if (stack.isEmpty()) {
-					return i;
+			/**
+			 * Remplace les constantes mathématiques de la chaîne par leurs valeurs
+			 * numériques.
+			 */
+			void replaceVars() {
+				str = str.replaceAll("\\b" + PI + "\\b", String.valueOf(Math.PI));
+				str = str.replaceAll("\\b" + EXPONENTIAL + "\\b", String.valueOf(Math.E));
+			}
+
+			void nextChar() {
+				ch = (++pos < str.length()) ? str.charAt(pos) : -1;
+			}
+
+			/**
+			 * Vérifie que le prochain caractère rencontré dans la chaîne est celui passé en
+			 * paramètre (ignore les espaces)
+			 * 
+			 * @param charToEat
+			 * @return
+			 */
+			boolean eat(int charToEat) {
+				while (ch == SPACE)
+					nextChar();
+				if (ch == charToEat) {
+					nextChar();
+					return true;
 				}
-			}
-		}
-		return -1;
-	}
-
-	private double genericSimpleComputation(String target, char operator) {
-		String[] expressions = target.split("\\" + operator);
-		if (expressions.length != 2) {
-			throw new IllegalArgumentException("Trop de signes " + operator);
-		}
-		double operator1 = Double.parseDouble(expressions[0]);
-		double operator2 = Double.parseDouble(expressions[1]);
-		switch (operator) {
-		case MULTIPLY:
-			return operator1 * operator2;
-		case DIVIDE:
-			return operator1 / operator2;
-		case PLUS:
-			return operator1 + operator2;
-		case MINUS:
-			return operator1 - operator2;
-		default:
-			throw new UnknownError("Operateur inconnu : " + operator);
-		}
-	}
-
-	private String replaceXs(String target, String replacement) {
-		if (assertNoMathematicalUnknow(replacement)) {
-			return target.replace("x", replacement);
-		}
-		throw new UnsupportedOperationException(
-				"La chaîne de remplacement contient des inconnus, veuillez les supprimer");
-	}
-
-	private boolean assertParenthesesFormed(String target) {
-		int openParentheses = 0;
-		int closeParentheses = 0;
-		int lengthTarget = target.length();
-		for (int i = 0; i < lengthTarget; i++) {
-			switch (target.charAt(i)) {
-			case ')':
-				if (i == 0 || openParentheses == closeParentheses) {
-					return false;
-				} else {
-					closeParentheses++;
-				}
-				break;
-			case '(':
-				openParentheses++;
-				break;
-			default:
-				continue;
-			}
-		}
-		return openParentheses == closeParentheses;
-	}
-
-	private boolean assertNoMathematicalUnknow(String target) {
-		List<Integer> ignoredIndexs = listOfMathemicalExpressionIndexs(target);
-		int lengthString = target.length();
-		for (int i = 0; i < lengthString; i++) {
-			if (!ignoredIndexs.contains(i) && (target.charAt(i) + "").matches("[a-zA-Z]+")) {
 				return false;
 			}
-		}
-		return true;
-	}
 
-	private List<Integer> listOfMathemicalExpressionIndexs(String target) {
-		List<Integer> allIndexs = new ArrayList<>();
-		allIndexs.addAll(findIndexsOfE(target));
-		allIndexs.addAll(findIndexsOfPI(target));
-		allIndexs.addAll(findIndexsOfSqrt(target));
-		return allIndexs;
-	}
-
-	private List<Integer> findIndexsOfSqrt(String target) {
-		return findIndexsOfOccurences(target, SQUARE_ROOT);
-	}
-
-	private List<Integer> findIndexsOfPI(String target) {
-		return findIndexsOfOccurences(target, PI);
-	}
-
-	private List<Integer> findIndexsOfE(String target) {
-		return findIndexsOfOccurences(target, EXPONENTIAL + "");
-	}
-
-	private List<Integer> findIndexsOfOccurences(String target, String occurence) {
-		List<Integer> indexs = new ArrayList<>();
-		int index = target.indexOf(occurence);
-		while (index >= 0) {
-			int lengthOccurence = occurence.length();
-			for (int i = 0; i < lengthOccurence; i++) {
-				indexs.add(index + i);
+			double parse() {
+				replaceVars();
+				nextChar();
+				double x = parseExpression();
+				if (pos < str.length())
+					throw new RuntimeException(
+							"Charactère inconnu: " + (char) ch + " arrêté sur: " + str.substring(0, pos));
+				return x;
 			}
-			index = target.indexOf(occurence, index + 1);
-		}
-		return indexs;
+
+			double parseExpression() {
+				double x = parseTerm();
+				for (;;) {
+					if (eat('+'))
+						x += parseTerm();
+					else if (eat('-'))
+						x -= parseTerm();
+					else
+						return x;
+				}
+			}
+
+			double parseTerm() {
+				double x = parseFactor();
+				for (;;) {
+					if (eat(MULTIPLY))
+						x *= parseFactor();
+					else if (eat(DIVIDE))
+						x /= parseFactor();
+					else
+						return x;
+				}
+			}
+
+			double parseFactor() {
+				if (eat(PLUS))
+					return parseFactor();
+				if (eat(MINUS))
+					return -parseFactor();
+
+				double x;
+				int startPos = this.pos;
+				if (eat('(')) {
+					x = parseExpression();
+					eat(')');
+				} else if ((ch >= '0' && ch <= '9') || ch == '.') {
+					while ((ch >= '0' && ch <= '9') || ch == '.')
+						nextChar();
+					x = Double.parseDouble(str.substring(startPos, this.pos));
+				} else if (ch >= 'a' && ch <= 'z') {
+					while (ch >= 'a' && ch <= 'z')
+						nextChar();
+					String func = str.substring(startPos, this.pos);
+					x = parseFactor();
+					if (func.equals(SQUARE_ROOT))
+						x = Math.sqrt(x);
+					else if (func.equals(SIN))
+						x = Math.sin(Math.toRadians(x));
+					else if (func.equals(COS))
+						x = Math.cos(Math.toRadians(x));
+					else if (func.equals(TAN))
+						x = Math.tan(Math.toRadians(x));
+					else if (func.equals(LN))
+						x = Math.log(x);
+					else if (func.equals(LOG))
+						x = Math.log10(x);
+					else
+						throw new RuntimeException("Fonction mathématique inconnue: " + func);
+				} else {
+					throw new RuntimeException(
+							"Charactère inconnu: " + (char) ch + " arrêté sur: " + str.substring(0, pos));
+				}
+
+				if (eat(POWER))
+					x = Math.pow(x, parseFactor());
+
+				return x;
+			}
+		}.parse();
 	}
 
 	public String getInputExpression() {
@@ -191,24 +180,12 @@ public class Expression {
 	}
 
 	public static void main(String[] args) {
-		Expression e = new Expression("e + sqrt sqresqrttes");
-		System.out.println(e.findIndexsOfSqrt(e.getInputExpression()));
-		System.out.println(e.findIndexsOfE(e.getInputExpression()));
-		System.out.println(e.assertParenthesesFormed(e.getInputExpression()));
-		System.out.println(e.assertParenthesesFormed("(bonjour (yolo))"));
-		System.out.println(e.assertParenthesesFormed("(bo(njour (yolo))"));
-		System.out.println(e.assertParenthesesFormed(")(bonjour (yolo))"));
-		System.out.println(e.assertParenthesesFormed("(bonjour (yolo)))"));
-		System.out.println(e.assertParenthesesFormed("o)(bonjour (y(olo))"));
-		System.out.println("\n" + e.assertNoMathematicalUnknow("sqrt x e pi"));
-		System.out.println(e.genericSimpleComputation("9 - 3", '-'));
-		System.out.println(e.genericSimpleComputation("4+3", '+'));
-		System.out.println(e.cutFirstParenthesis("(4+2)(2+9)"));
-		System.out.println(e.cutFirstParenthesis("()(2+9)"));
-		System.out.println(e.cutFirstParenthesis("(       )(2+9)"));
-		System.out.println(e.cutFirstParenthesis("(4+2(2+9))"));
-		System.out.println(e.findIndexClosingParenthesisOfFirstParentheses("(hello(no))") + " => 10");
-		System.out.println(e.findIndexClosingParenthesisOfFirstParentheses("(good(morning?)night)") + " => 20");
-		System.out.println(e.findIndexClosingParenthesisOfFirstParentheses("(hi how are you)(not fine)") + " => 15");
+		Expression f = new Expression("(1+9*7/(7*5/9))");
+		System.out.println(f.eval());
+		Expression fe = new Expression("( 1 + 9 * 856 / ( 7 * 5 / 78))");
+		System.out.println(fe.eval());
+		String s = "3 + 9 * log(10) - 9 * pi";
+		Expression fez = new Expression(s);
+		System.out.println(fez.eval());
 	}
 }
