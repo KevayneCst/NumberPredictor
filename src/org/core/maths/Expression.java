@@ -1,5 +1,10 @@
 package org.core.maths;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Classe représentant une expression mathématique. Voici la liste des fonctions
  * mathématiques actuellements prisent en compte :<br>
@@ -175,6 +180,25 @@ public class Expression {
 		}.parse();
 	}
 
+	public boolean matches(List<Double> numberSequence) {
+		int lengthNumberSequence = numberSequence.size();
+		if (numberSequence.size() < 2) throw new IllegalArgumentException("La suite de nombre est trop peu fournis pour produire un résultat, mettez au moins 2 chiffres actuellement il y en a "+lengthNumberSequence);
+		double supposedNextValue = computeReplaceUnknows(numberSequence.get(0));
+		for (int i = 1; i < lengthNumberSequence; i++) {
+			double currentNumberSequenceValue = numberSequence.get(i);
+			if (supposedNextValue == currentNumberSequenceValue) {
+				supposedNextValue = computeReplaceUnknows(currentNumberSequenceValue);
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public double computeReplaceUnknows(Double replacement) {
+		return new Expression(inputExpression.replaceAll("x", String.valueOf(replacement))).eval();
+	}
+
 	public String getInputExpression() {
 		return inputExpression;
 	}
@@ -187,5 +211,8 @@ public class Expression {
 		String s = "3 + 9 * log(10) - 9 * pi";
 		Expression fez = new Expression(s);
 		System.out.println(fez.eval());
+		Expression yes = new Expression("1 + x - 5");
+		List<Double> list = Arrays.asList(1., -3., -7., -11.);
+		System.out.println("Est-ce "+yes.getInputExpression()+" suit la suite suivante : "+list+" : "+yes.matches(list));
 	}
 }
