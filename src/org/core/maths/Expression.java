@@ -16,11 +16,11 @@ package org.core.maths;
  * <li>Sinus => écrire <b>sin(X)</b></li>
  * <li>Cosinus => écrire <b>cos(X)</b></li>
  * <li>Tangente => écrire <b>tan(X)</b></li>
- * <li><b></b></li>
- * <li><b></b></li>
- * <li><b></b></li>
- * <li><b></b></li>
- * <li><b></b></li>
+ * <li>Puissance => écrire <b>X^X</b></li>
+ * <li>Diviser => écrire <b>/</b></li>
+ * <li>Multiplier => écrire <b>*</b></li>
+ * <li>Addition => écrire <b>+</b></li>
+ * <li>Soustraction => écrire <b>-</b></li>
  * </ul>
  * 
  * @author Kévin Constantin
