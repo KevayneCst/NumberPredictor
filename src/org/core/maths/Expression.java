@@ -215,8 +215,12 @@ public class Expression {
 		return true;
 	}
 
-	public double computeReplaceUnknows(Double replacement) {
-		return new Expression(inputExpression.replaceAll("x", String.valueOf(replacement))).eval();
+	public double computeReplaceUnknows(double replacement) {
+		String cleanExpression = inputExpression;
+		for (String currentString : vars) {
+			cleanExpression = cleanExpression.replace(currentString, String.valueOf(replacement));
+		}
+		return new Expression(cleanExpression).eval();
 	}
 
 	public String getInputExpression() {
