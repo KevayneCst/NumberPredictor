@@ -73,7 +73,7 @@ public class Expression {
 			 * Remplace les constantes mathématiques de la chaîne par leurs valeurs
 			 * numériques.
 			 */
-			void replaceVars() {
+			void replaceFinalValues() {
 				str = str.replaceAll("\\b" + PI + "\\b", String.valueOf(Math.PI));
 				str = str.replaceAll("\\b" + EXPONENTIAL + "\\b", String.valueOf(Math.E));
 			}
@@ -100,7 +100,7 @@ public class Expression {
 			}
 
 			double parse() {
-				replaceVars();
+				replaceFinalValues();
 				nextChar();
 				double x = parseExpression();
 				if (pos < str.length())
