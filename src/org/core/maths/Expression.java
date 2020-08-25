@@ -87,7 +87,8 @@ public class Expression {
 	public double eval() {
 		return new Object() {
 			String str = inputExpression;
-			int pos = -1, ch;
+			int pos = -1;
+			int ch;
 
 			/**
 			 * Remplace les constantes mathématiques de la chaîne par leurs valeurs
