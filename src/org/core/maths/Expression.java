@@ -49,9 +49,29 @@ public class Expression {
 	private static final char SPACE = ' ';
 
 	private String inputExpression;
+	private List<String> vars;
+
+	public Expression(String expression, List<String> vars) {
+		this.inputExpression = expression;
+		if (verifyVarNames(vars)) {
+			this.vars = vars;
+		} else {
+			throw new IllegalArgumentException("Le nom d'une variable est un mot reservé, veuillez le changer");
+		}
+	}
 
 	public Expression(String expression) {
 		this.inputExpression = expression;
+		this.vars = new ArrayList<>();
+	}
+
+	private boolean verifyVarNames(List<String> vars) {
+		for (String currentString : vars) {
+			if (currentString.equals(EXPONENTIAL) || currentString.equals(PI) || !currentString.matches("[a-zA-Z]+")) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
